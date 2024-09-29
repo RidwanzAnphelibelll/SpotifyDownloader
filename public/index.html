@@ -119,9 +119,22 @@
 
     .loading {
       display: none;
-      font-size: 1.2rem;
-      color: #1ed760;
       margin-top: 20px;
+    }
+
+    .spinner {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #1ed760;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .result {
@@ -213,7 +226,9 @@
       <input type="url" id="spotifyUrl" placeholder="Enter Spotify Track URL" required>
       <button type="submit">Download</button>
     </form>
-    <div class="loading" id="loading">Processing your request...</div>
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+    </div>
     <div class="result" id="result"></div>
     <p class="download-another" id="downloadAnother">Download Another Track</p>
     <footer>
@@ -252,6 +267,7 @@
           resultDiv.innerHTML = `
             <h2>${data.title}</h2>
             <p><strong>Artist:</strong> ${data.artist}</p>
+            <p><strong>Release Date:</strong> ${data.releaseDate}</p>
             <img src="${data.thumbnail}" alt="${data.title}">
             <p><a href="${data.audio}" class="download-btn" download>Download 320kbps MP3</a></p>
           `;
@@ -260,16 +276,16 @@
           resultDiv.innerHTML = `<p class="error">Error: No result found!</p>`;
         }
       } catch (error) {
-        resultDiv.innerHTML = `<p class="error">Error: Failed to download the track.</p>`;
+        resultDiv.innerHTML = `<p class="error">An error occurred. Please try again later.</p>`;
       } finally {
         loadingDiv.style.display = "none";
       }
     });
 
-    document.getElementById('downloadAnother').addEventListener('click', function() {
-      document.getElementById('spotifyUrl').value = "";
-      document.getElementById('result').innerHTML = "";
-      this.style.display = "none";
+    document.getElementById('downloadAnother').addEventListener('click', () => {
+      document.getElementById('spotifyUrl').value = '';
+      document.getElementById('result').innerHTML = '';
+      document.getElementById('downloadAnother').style.display = 'none';
     });
   </script>
 </body>
