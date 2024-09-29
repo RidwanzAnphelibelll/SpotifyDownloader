@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Spotify MP3 Downloader - Download your favorite Spotify tracks in high-quality 320kbps MP3 format.">
+  <title>Spotify MP3 Downloader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #121212;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image: linear-gradient(45deg, #1db954, #191414, #1ed760, #191414);
+      background-size: 200% 200%;
+      animation: gradientShift 6s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container {
+      background-color: #292b2f;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.6);
+      text-align: center;
+      width: 100%;
+      max-width: 500px;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: #1ed760;
+    }
+
+    h1 span {
+      color: #fff;
+    }
+
+    .logo {
+      width: 90px;
+      margin-bottom: 15px;
+      filter: drop-shadow(0px 5px 5px rgba(0, 0, 0, 0.4));
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: #ccc;
+    }
+
+    form {
+      margin-bottom: 30px;
+    }
+
+    input[type="url"] {
+      width: 100%;
+      padding: 15px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 30px;
+      margin-bottom: 20px;
+      background-color: #333;
+      color: #fff;
+      transition: box-shadow 0.3s ease;
+    }
+
+    input[type="url"]:focus {
+      outline: none;
+      box-shadow: 0 0 10px #1ed760;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      font-size: 1.2rem;
+      background-color: #1db954;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #159f44;
+    }
+
+    .loading {
+      display: none;
+      font-size: 1.2rem;
+      color: #1ed760;
+      margin-top: 20px;
+    }
+
+    .result {
+      margin-top: 30px;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .result h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .result p {
+      font-size: 1rem;
+      margin-bottom: 15px;
+    }
+
+    .result img {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .download-btn {
+      display: inline-block;
+      padding: 12px 25px;
+      background-color: #1db954;
+      color: white;
+      text-decoration: none;
+      border-radius: 30px;
+      transition: background-color 0.3s ease;
+    }
+
+    .download-btn:hover {
+      background-color: #159f44;
+    }
+
+    .download-another {
+      margin-top: 20px;
+      display: none;
+      cursor: pointer;
+      color: #1ed760;
+      font-size: 1rem;
+    }
+
+    .error {
+      color: red;
+      font-size: 1.2rem;
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 0.9rem;
+      color: #777;
+    }
+
+    footer a {
+      color: #1db954;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: #159f44;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 30px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      input[type="url"], button {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/8/84/Spotify_icon.svg" alt="Spotify Logo" class="logo">
+    <h1><span>Spotify</span> MP3 Downloader</h1>
+    <p>Download your favorite Spotify tracks in high-quality 320kbps MP3 format and enjoy offline music.</p>
+    <form id="spotifyForm">
+      <input type="url" id="spotifyUrl" placeholder="Enter Spotify Track URL" required>
+      <button type="submit">Download</button>
+    </form>
+    <div class="loading" id="loading">Processing your request...</div>
+    <div class="result" id="result"></div>
+    <p class="download-another" id="downloadAnother">Download Another Track</p>
+    <footer>
+      <p>&copy; 2024. All rights reserved. | Developed with ❤️ by <a href="https://github.com/RidwanzAnphelibelll" target="_blank">Ridwanz</a></p>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('spotifyForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const url = document.getElementById('spotifyUrl').value;
+      const resultDiv = document.getElementById('result');
+      const loadingDiv = document.getElementById('loading');
+      const downloadAnother = document.getElementById('downloadAnother');
+      
+      loadingDiv.style.display = "block";
+      resultDiv.innerHTML = "";
+      downloadAnother.style.display = "none";
+
+      const isValidSpotifyUrl = (url) => /^https:\/\/open\.spotify\.com\/track\//.test(url);
+      if (!isValidSpotifyUrl(url)) {
+        loadingDiv.style.display = "none";
+        resultDiv.innerHTML = `<p class="error">Please enter a valid Spotify track URL.</p>`;
+        return;
+      }
+
+      try {
+        const response = await fetch('/download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          resultDiv.innerHTML = `
+            <h2>${data.title}</h2>
+            <p><strong>Artist:</strong> ${data.artist}</p>
+            <img src="${data.thumbnail}" alt="${data.title}">
+            <p><a href="${data.audio}" class="download-btn" download>Download 320kbps MP3</a></p>
+          `;
+          downloadAnother.style.display = "block";
+        } else {
+          resultDiv.innerHTML = `<p class="error">Error: No result found!</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="error">Error: Failed to download the track.</p>`;
+      } finally {
+        loadingDiv.style.display = "none";
+      }
+    });
+
+    document.getElementById('downloadAnother').addEventListener('click', function() {
+      document.getElementById('spotifyUrl').value = "";
+      document.getElementById('result').innerHTML = "";
+      this.style.display = "none";
+    });
+  </script>
+</body>
+</html>

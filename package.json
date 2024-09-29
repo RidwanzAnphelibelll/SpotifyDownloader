@@ -1,0 +1,15 @@
+{
+  "name": "SpotifyDownloader",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "RidwanzSaputra",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.0",
+    "chalk": "^4.1.0",
+    "cors": "^2.8.5",
+    "got": "^11.8.6"
+  }
+}
