@@ -13,14 +13,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.post('/download', async (req, res) => {
+app.post('/track', async (req, res) => {
   const { url } = req.body;
-  try {
-    const result = await spotify(url);
-    return res.json(result);
-  } catch (error) {
-    return res.status(500).json({ error: 'Failed to download the track. Please try again.' });
-  }
+  const result = await spotify(url);
+  return res.json(result);
+});
+
+app.post('/search', async (req, res) => {
+  const { query } = req.body;
+  const results = await spotify(query);
+  return res.json(results);
 });
 
 app.listen(PORT, () => {
