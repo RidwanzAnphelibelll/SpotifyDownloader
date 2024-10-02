@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Spotify MP3 Downloader - Download your favorite Spotify tracks in high-quality 320kbps MP3 format.">
+  <meta name="description" content="Spotify MP3 Downloader - Download your favorite Spotify tracks or search tracks in high-quality 320kbps MP3 format.">
   <title>Spotify MP3 Downloader</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -84,7 +84,7 @@
       margin-bottom: 30px;
     }
 
-    input[type="url"] {
+    input[type="text"] {
       width: 100%;
       padding: 15px;
       font-size: 1rem;
@@ -96,7 +96,7 @@
       transition: box-shadow 0.3s ease;
     }
 
-    input[type="url"]:focus {
+    input[type="text"]:focus {
       outline: none;
       box-shadow: 0 0 10px #1ed760;
     }
@@ -211,8 +211,8 @@
         font-size: 2rem;
       }
 
-      input[type="url"], button {
-        font-size: 1rem;
+      input[type="text"], button {
+        font-size: 0.950rem;
       }
     }
   </style>
@@ -221,16 +221,16 @@
   <div class="container">
     <img src="https://upload.wikimedia.org/wikipedia/commons/8/84/Spotify_icon.svg" alt="Spotify Logo" class="logo">
     <h1><span>Spotify</span> MP3 Downloader</h1>
-    <p>Download your favorite Spotify tracks in high-quality 320kbps MP3 format and enjoy offline music.</p>
+    <p>Download your favorite Spotify tracks or search tracks in high-quality 320kbps MP3 format.</p>
     <form id="spotifyForm">
-      <input type="url" id="spotifyUrl" placeholder="Enter Spotify Track URL" required>
+      <input type="text" id="spotifyInput" placeholder="Enter Spotify Track URL or search query" required>
       <button type="submit">Download</button>
     </form>
     <div class="loading" id="loading">
       <div class="spinner"></div>
     </div>
     <div class="result" id="result"></div>
-    <p class="download-another" id="downloadAnother">Download Another Track</p>
+    <p class="download-another" id="downloadAnother">Download Another</p>
     <footer>
       <p>&copy; 2024. All rights reserved. | Developed with ❤️ by <a href="https://github.com/RidwanzAnphelibelll" target="_blank">Ridwanz</a></p>
     </footer>
@@ -239,7 +239,7 @@
   <script>
     document.getElementById('spotifyForm').addEventListener('submit', async function (e) {
       e.preventDefault();
-      const url = document.getElementById('spotifyUrl').value;
+      const input = document.getElementById('spotifyInput').value.trim();
       const resultDiv = document.getElementById('result');
       const loadingDiv = document.getElementById('loading');
       const downloadAnother = document.getElementById('downloadAnother');
@@ -248,44 +248,67 @@
       resultDiv.innerHTML = "";
       downloadAnother.style.display = "none";
 
-      const isValidSpotifyUrl = (url) => /^https:\/\/open\.spotify\.com\/track\//.test(url);
-      if (!isValidSpotifyUrl(url)) {
-        loadingDiv.style.display = "none";
-        resultDiv.innerHTML = `<p class="error">Please enter a valid Spotify track URL.</p>`;
-        return;
-      }
+      const isSpotifyUrl = (input) => /^https:\/\/open\.spotify\.com\/track\//.test(input);
+      if (isSpotifyUrl(input)) {
+        try {
+          const response = await fetch('/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: input })
+          });
 
-      try {
-        const response = await fetch('/download', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          resultDiv.innerHTML = `
-            <h2>${data.title}</h2>
-            <p><strong>Artist:</strong> ${data.artist}</p>
-            <p><strong>Release Date:</strong> ${data.releaseDate}</p>
-            <img src="${data.thumbnail}" alt="${data.title}">
-            <p><a href="${data.audio}" class="download-btn" download>Download 320kbps MP3</a></p>
-          `;
-          downloadAnother.style.display = "block";
-        } else {
-          resultDiv.innerHTML = `<p class="error">Error: No result found!</p>`;
+          if (response.ok) {
+            const data = await response.json();
+            resultDiv.innerHTML = `
+              <h2>${data.title}</h2>
+              <p><strong>Artist:</strong> ${data.artist}</p>
+              <p><strong>Release Date:</strong> ${data.releaseDate}</p>
+              <img src="${data.thumbnail}" alt="${data.title}">
+              <p><a href="${data.audio}" class="download-btn" download>Download MP3</a></p>
+            `;
+            downloadAnother.style.display = "block";
+          } else {
+            resultDiv.innerHTML = `<p class="error">No results found!</p>`;
+          }
+        } catch (error) {
+          resultDiv.innerHTML = `<p class="error">An error occurred. Please try again later.</p>`;
+        } finally {
+          loadingDiv.style.display = "none";
         }
-      } catch (error) {
-        resultDiv.innerHTML = `<p class="error">An error occurred. Please try again later.</p>`;
-      } finally {
-        loadingDiv.style.display = "none";
+      } else {
+      
+        try {
+          const response = await fetch('/search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: input })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            resultDiv.innerHTML = `
+              <h2>${data.title}</h2>
+              <p><strong>Artist:</strong> ${data.artist}</p>
+              <p><strong>Release Date:</strong> ${data.releaseDate}</p>
+              <img src="${data.thumbnail}" alt="${data.title}">
+              <p><a href="${data.audio}" class="download-btn" download>Download MP3</a></p>
+            `;
+            downloadAnother.style.display = "block";
+          } else {
+            resultDiv.innerHTML = `<p class="error">No results found!</p>`;
+          }
+        } catch (error) {
+          resultDiv.innerHTML = `<p class="error">An error occurred. Please try again later.</p>`;
+        } finally {
+          loadingDiv.style.display = "none";
+        }
       }
     });
 
-    document.getElementById('downloadAnother').addEventListener('click', () => {
-      document.getElementById('spotifyUrl').value = '';
+    document.getElementById('downloadAnother').addEventListener('click', function () {
+      document.getElementById('spotifyInput').value = '';
       document.getElementById('result').innerHTML = '';
-      document.getElementById('downloadAnother').style.display = 'none';
+      this.style.display = 'none';
     });
   </script>
 </body>
