@@ -36,13 +36,15 @@
 
     .container {
       background-color: #292b2f;
-      padding: 30px;
+      padding: 50px;
       border-radius: 15px;
       box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.6);
       text-align: center;
       width: 100%;
-      max-width: 1000px;
+      max-width: 800px;
       animation: fadeIn 1.5s ease-in-out;
+      max-height: 100vh;
+      overflow-y: auto;
     }
 
     @keyframes fadeIn {
@@ -58,7 +60,7 @@
 
     h1 {
       font-size: 2.5rem;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       font-weight: bold;
       letter-spacing: 2px;
       color: #1ed760;
@@ -202,9 +204,9 @@
       color: #159f44;
     }
 
-    @media (max-width: 800px) {
+    @media (max-width: 768px) {
       .container {
-        padding: 20px;
+        padding: 30px;
       }
 
       h1 {
@@ -212,7 +214,7 @@
       }
 
       input[type="text"], button {
-        font-size: 0.980rem;
+        font-size: 0.950rem;
       }
     }
   </style>
@@ -248,6 +250,7 @@
       resultDiv.innerHTML = "";
       downloadAnother.style.display = "none";
 
+
       const isSpotifyUrl = (input) => /^https:\/\/open\.spotify\.com\/track\//.test(input);
       if (isSpotifyUrl(input)) {
         try {
@@ -260,11 +263,11 @@
           if (response.ok) {
             const data = await response.json();
             resultDiv.innerHTML = `
-              <h2>${data.title}</h2>
-              <p><strong>Artist:</strong> ${data.artist}</p>
-              <p><strong>Release Date:</strong> ${data.releaseDate}</p>
-              <img src="${data.thumbnail}" alt="${data.title}">
-              <p><a href="${data.audio}" class="download-btn" download>Download MP3</a></p>
+              <h2>${data[0].title}</h2>
+              <p><strong>Artist:</strong> ${data[0].artist}</p>
+              <p><strong>Release Date:</strong> ${data[0].releaseDate}</p>
+              <img src="${data[0].thumbnail}" alt="${data[0].title}">
+              <p><a href="${data[0].audio}" class="download-btn" download>Download MP3</a></p>
             `;
             downloadAnother.style.display = "block";
           } else {
@@ -276,7 +279,6 @@
           loadingDiv.style.display = "none";
         }
       } else {
-      
         try {
           const response = await fetch('/search', {
             method: 'POST',
@@ -286,13 +288,15 @@
 
           if (response.ok) {
             const data = await response.json();
-            resultDiv.innerHTML = `
-              <h2>${data.title}</h2>
-              <p><strong>Artist:</strong> ${data.artist}</p>
-              <p><strong>Release Date:</strong> ${data.releaseDate}</p>
-              <img src="${data.thumbnail}" alt="${data.title}">
-              <p><a href="${data.audio}" class="download-btn" download>Download MP3</a></p>
-            `;
+            resultDiv.innerHTML = data.map((track, index) => `
+              <div class="track">
+                <h2>${index + 1}. ${track.title}</h2>
+                <p><strong>Artist:</strong> ${track.artist}</p>
+                <p><strong>Release Date:</strong> ${track.releaseDate}</p>
+                <img src="${track.thumbnail}" alt="${track.title}">
+                <p><a href="${track.audio}" class="download-btn" download>Download MP3</a></p>
+              </div>
+            `).join('');
             downloadAnother.style.display = "block";
           } else {
             resultDiv.innerHTML = `<p class="error">No results found!</p>`;
