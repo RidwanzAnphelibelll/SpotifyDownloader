@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  
   <style>
     * {
       margin: 0;
@@ -251,44 +252,24 @@
       resultDiv.innerHTML = "";
       downloadAnother.style.display = "none";
 
-
       const isSpotifyUrl = (input) => /^https:\/\/open\.spotify\.com\/track\//.test(input);
-      if (isSpotifyUrl(input)) {
-        try {
-          const response = await fetch('/track', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url: input })
-          });
+      
+      try {
+        const endpoint = isSpotifyUrl(input) ? '/track' : '/search';
+        const body = isSpotifyUrl(input) ? { url: input } : { query: input };
 
-          if (response.ok) {
-            const data = await response.json();
-            resultDiv.innerHTML = `
-              <h2>${data[0].title}</h2>
-              <p><strong>Artist:</strong> ${data[0].artist}</p>
-              <p><strong>Release Date:</strong> ${data[0].releaseDate}</p>
-              <img src="${data[0].thumbnail}" alt="${data[0].title}">
-              <p><a href="${data[0].audio}" class="download-btn" download>Download MP3</a></p>
-            `;
-            downloadAnother.style.display = "block";
-          } else {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+
+          if (data.length === 0) {
             resultDiv.innerHTML = `<p class="error">No results found!</p>`;
-          }
-        } catch (error) {
-          resultDiv.innerHTML = `<p class="error">An error occurred. Please try again later.</p>`;
-        } finally {
-          loadingDiv.style.display = "none";
-        }
-      } else {
-        try {
-          const response = await fetch('/search', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: input })
-          });
-
-          if (response.ok) {
-            const data = await response.json();
+          } else {
             resultDiv.innerHTML = data.map((track, index) => `
               <div class="track">
                 <h2>${index + 1}. ${track.title}</h2>
@@ -299,14 +280,14 @@
               </div>
             `).join('');
             downloadAnother.style.display = "block";
-          } else {
-            resultDiv.innerHTML = `<p class="error">No results found!</p>`;
           }
-        } catch (error) {
-          resultDiv.innerHTML = `<p class="error">An error occurred. Please try again later.</p>`;
-        } finally {
-          loadingDiv.style.display = "none";
+        } else {
+          resultDiv.innerHTML = `<p class="error">No results found!</p>`;
         }
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="error">An error occurred. Please try again later.</p>`;
+      } finally {
+        loadingDiv.style.display = "none";
       }
     });
 
