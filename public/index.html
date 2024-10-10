@@ -8,7 +8,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
   <style>
     * {
       margin: 0;
@@ -178,7 +177,7 @@
     }
 
     .download-another {
-      margin-top: 20px;
+      margin-top: 25px;
       display: none;
       cursor: pointer;
       color: #1ed760;
@@ -252,6 +251,7 @@
       resultDiv.innerHTML = "";
       downloadAnother.style.display = "none";
 
+
       const isSpotifyUrl = (input) => /^https:\/\/open\.spotify\.com\/track\//.test(input);
       if (isSpotifyUrl(input)) {
         try {
@@ -291,7 +291,7 @@
             const data = await response.json();
             resultDiv.innerHTML = data.map((track, index) => `
               <div class="track">
-                <h2>${index + 1}. ${track.title}</h2>
+                <h2>${track.title}</h2>
                 <p><strong>Artist:</strong> ${track.artist}</p>
                 <p><strong>Release Date:</strong> ${track.releaseDate}</p>
                 <img src="${track.thumbnail}" alt="${track.title}">
